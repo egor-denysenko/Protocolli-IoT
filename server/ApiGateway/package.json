@@ -20,7 +20,8 @@
     "fastify-cli": "^2.13.0",
     "fastify-plugin": "^3.0.0",
     "fastify-sensible": "^3.1.0",
-    "fastify-swagger": "^4.12.6"
+    "fastify-swagger": "^4.12.6",
+    "influx": "^5.9.2"
   },
   "devDependencies": {
     "tap": "^15.0.9"
