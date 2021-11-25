@@ -1,6 +1,7 @@
 'use strict'
 
 module.exports = async function(fastify, opts) {
+    fastify.register(require('fastify-formbody'))
     fastify.post('/', {
         schema: {
             tags: ['Drones'],
@@ -9,12 +10,12 @@ module.exports = async function(fastify, opts) {
                 type: 'object',
                 required: ['id', 'velocity', 'battery', 'latitude', 'longitude', 'time'],
                 properties: {
-                    'id': { type: 'string', format: 'uuid' },
+                    'id': { type: 'number', },
                     'velocity': { type: 'number' },
                     'battery': { type: 'number' },
                     'latitude': { type: 'number' },
                     'longitude': { type: 'number' },
-                    'time': { type: "string", /*format: "date-time"*/ }
+                    'time': { type: "string" }
                 }
             },
             response: {
@@ -30,10 +31,9 @@ module.exports = async function(fastify, opts) {
         },
         handler: async function(request, reply) {
             try {
-                console.log(request.body)
                 const { id, velocity, longitude, latitude, battery, time } = request.body
+                console.log(request.body)
                     //Requesting the object parameters as local variables
-                    //const { id, velocity, battery, position } = request.body
                     //Part that interfaces with InfluxDB and sends data to the database
                 fastify.writeDroneData(id, velocity, longitude, latitude, battery, time)
                     //Talking to redis and asking to the queue if there are some commands to actuate in the drone
