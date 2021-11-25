@@ -1,16 +1,18 @@
+import json
 import requests
-ipAddr = ':8086/Drones'
+ipAddr = 'http://192.168.43.237:8642/drones/'
+# ipAddr = 'http://localhost:3000/drones/'
 
 def postData(dataDict):
 
+    jsonData = json.dumps(dataDict, indent=4)
     print()
     print("Sending data")
-    print(dataDict)
+    print(jsonData)
     print()
-
-    response = requests.post(ipAddr, data=dataDict)
-    responseData = response.read()
-
+    headers = {'Content-type': 'application/json'}
+    response = requests.post(ipAddr, data=str(jsonData), headers=headers)
+    responseData = response.json()
     print()
     print("Server response: ")
     print(responseData)
@@ -18,4 +20,4 @@ def postData(dataDict):
     print("-------END POST-------")
     print()
 
-    return {}
+    return responseData['command']
