@@ -3,19 +3,20 @@ import droneRequests
 import time
 from datetime import date, datetime, timedelta
 
-id = '7f639f3e-71b4-464b-81da-2a3798242716'
+id = 123456
 data = {}
 data['id'] = id
 start_time = datetime.now()
 
 while(True):
-    time.sleep(2)
+    # time.sleep(1)
     data['velocity'] = speedSensor.getSpeed()
     data['battery'] = batterySensor.getBatteryLevel()
     data['latitude'] = gpsSensor.getLatitude()
     data['longitude'] = gpsSensor.getLongitude()
     exec_time = datetime.now() - start_time
-    data['time'] = str(exec_time)
+    data['time'] = datetime.now().isoformat()
 
-    commands = droneRequests.postData(data)
-    print(commands)
+    command = droneRequests.postData(data)
+    if(command == 'off'):
+        print("Drone is shutting down")
