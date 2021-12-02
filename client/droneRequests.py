@@ -14,8 +14,7 @@ def postData(dataDict):
     client = paho.Client(droneName)
     client.on_publish = on_publish
     client.connect(broker, port)
-    for line in dataDict:
-        if line != 'id':
-            value = dataDict[line]
-            response = client.publish(f"protocolli-IoT/{droneName}/telemetry/{line}", value)
+    jsonData = json.dumps(dataDict, indent=4)
+    response = client.publish(f"protocolli-IoT/{droneName}/telemetry", jsonData)
+    return response
             

@@ -20,7 +20,7 @@ while(True):
     data['time'] = datetime.now().isoformat()
     print(data)
     command = droneRequests.postData(data)
-    if(command == 'off'):
-        print("Drone is shutting down")
-        break
+    # if(command == 'off'):
+    #     print("Drone is shutting down")
+    #     break
     time.sleep(1)
