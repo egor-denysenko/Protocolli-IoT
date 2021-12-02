@@ -8,7 +8,7 @@ module.exports = fp(async function(fastify, opts) {
         routePrefix: '/api-docs',
         swagger: {
             info: {
-                title: 'Gne cose',
+                title: 'HTTP Drone',
                 description: 'Testing the Fastify swagger API',
                 version: '0.1.0'
             },
@@ -16,7 +16,7 @@ module.exports = fp(async function(fastify, opts) {
                 url: 'https://swagger.io',
                 description: 'Find more info here'
             },
-            host: 'localhost:3000',
+            host: 'localhost:8642',
             schemes: ['http'],
             consumes: ['application/json'],
             produces: ['application/json'],

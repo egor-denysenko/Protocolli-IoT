@@ -36,9 +36,6 @@ module.exports = async function(fastify, opts) {
                     //Requesting the object parameters as local variables
                     //Part that interfaces with InfluxDB and sends data to the database
                 fastify.writeDroneData(id, velocity, longitude, latitude, battery, time)
-                    //Talking to redis and asking to the queue if there are some commands to actuate in the drone
-                    //If there is a command save it to the database and send to the Edge response body with status OK and a string of the command 
-                    //If there is not a command in the queue return Ok and listen for the new request
                 return { status: true, command: process.env.DRONE_COMMAND }
             } catch (err) {
                 //catch the error and log them in to the db
