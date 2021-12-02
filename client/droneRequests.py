@@ -1,23 +1,21 @@
 import json
 import requests
-ipAddr = 'http://192.168.166.237:8642/drones/'
-# ipAddr = 'http://localhost:3000/drones/'
+import paho.mqtt.client as paho
+from requests.models import to_native_string
+broker = "test.mosquitto.org"
+port = 1883
+
+def on_publish(client, userdata, result):
+    print("Data published")
 
 def postData(dataDict):
-
-    jsonData = json.dumps(dataDict, indent=4)
-    print()
-    print("Sending data")
-    print(jsonData)
-    print()
-    headers = {'Content-type': 'application/json'}
-    response = requests.post(ipAddr, data=str(jsonData), headers=headers)
-    responseData = response.json()
-    print()
-    print("Server response: ")
-    print(responseData)
-    print()
-    print("-------END POST-------")
-    print()
-
-    return responseData['command']
+    
+    droneName = f"drone-{dataDict['id']}"
+    client = paho.Client(droneName)
+    client.on_publish = on_publish
+    client.connect(broker, port)
+    for line in dataDict:
+        if line != 'id':
+            value = dataDict[line]
+            response = client.publish(f"protocolli-IoT/{droneName}/telemetry/{line}", value)
+            
