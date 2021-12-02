@@ -1,6 +1,6 @@
 import json
 import requests
-ipAddr = 'http://192.168.43.237:8642/drones/'
+ipAddr = 'http://192.168.166.237:8642/drones/'
 # ipAddr = 'http://localhost:3000/drones/'
 
 def postData(dataDict):
