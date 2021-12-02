@@ -23,6 +23,7 @@
         "fastify-sensible": "^3.1.0",
         "fastify-swagger": "^4.12.6",
         "influx": "^5.9.2",
+        "mqtt": "^4.2.8",
         "pg-promise": "^10.11.1"
     },
     "devDependencies": {

@@ -1,7 +1,6 @@
 import json
 import requests
 import paho.mqtt.client as paho
-from requests.models import to_native_string
 broker = "test.mosquitto.org"
 port = 1883
 
