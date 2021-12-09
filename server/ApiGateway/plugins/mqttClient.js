@@ -10,8 +10,8 @@ module.exports = fp(async function(fastify, opts) {
     // server.listen(port, function() {
     //     console.log('server started and listening on port ', port)
     // })
-    var mqtt = require('mqtt')
-    var client = mqtt.connect('mqtt://127.0.0.1')
+    let mqtt = require('mqtt')
+    let client = mqtt.connect('mqtt://127.0.0.1')
 
     client.on('connect', function() {
         client.subscribe('protocolli-IoT/+/telemetry')
@@ -32,4 +32,10 @@ module.exports = fp(async function(fastify, opts) {
             console.log("messaggio non per te")
         }
     })
+
+    function sendCommandToDrone(droneID) {
+        console.log("manda mess")
+        client.publish(`protocolli-IoT/drone-${droneID}/command`, 'shutdown', { qos: 2 })
+    }
+    setInterval(sendCommandToDrone, 2000, 654)
 })
