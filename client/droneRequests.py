@@ -1,6 +1,5 @@
 import json
 import paho.mqtt.client as paho
-
 broker = "test.mosquitto.org"
 port = 1883
 subscribed = False

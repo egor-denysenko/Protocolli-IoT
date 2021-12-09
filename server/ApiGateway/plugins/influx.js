@@ -11,20 +11,18 @@ module.exports = fp(async function(fastify, opts) {
     const client = new InfluxDB({ url: 'http://localhost:8086', token: process.env.INFLUX_TOKEN })
 
 
-    function writeDroneData(id, velocity, longitude, latitude, battery, time) {
+    function writeDroneData(obj) {
         const writeApi = client.getWriteApi(org, bucket)
         writeApi.useDefaultTags({ host: 'host1' })
-        console.log(id)
-        console.log(time)
-        console.log(new Date(time))
+        console.log(obj.id)
         const point = new Point('mem')
-            .intField('droneId', id)
-            .floatField('velocity', velocity)
-            .floatField('longitude', longitude)
-            .floatField('latitude', latitude)
+            .intField('droneId', obj.id)
+            .floatField('velocity', obj.velocity)
+            .floatField('longitude', obj.longitude)
+            .floatField('latitude', obj.latitude)
             .measurement("DroneData")
-            .intField('battery', battery)
-            .timestamp(new Date(time))
+            .intField('battery', obj.battery)
+            .timestamp(new Date(obj.time))
         writeApi.writePoint(point)
         writeApi
             .close()
