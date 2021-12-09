@@ -1,26 +1,39 @@
 from sensors import gpsSensor, batterySensor, speedMeasurer
-import droneRequests
-import time
+from droneRequests import droneRequests
 from datetime import datetime, timedelta
 
 id = 123456
 data = {}
 data['id'] = id
+
 start_time = datetime.now()
 positionSensor = gpsSensor.GpsSensor()
 spdSensor = speedMeasurer.SpeedMeasurer(positionSensor, timedelta())
+mqttModule = droneRequests(id)
+dataSent = False
 
 while(True):
-    gpsData = positionSensor.getPositionData()
-    data['latitude'] = gpsData['latitude']
-    data['longitude'] = gpsData['longitude']
+
     exec_time = datetime.now() - start_time
-    data['velocity'] = spdSensor.getSpeed(exec_time)
-    data['battery'] = batterySensor.getBatteryLevel()
-    data['time'] = datetime.now().isoformat()
-    print(data)
-    command = droneRequests.postData(data)
-    # if(command == 'off'):
-    #     print("Drone is shutting down")
-    #     break
-    time.sleep(1)
+
+    # check for incoming commands in /drone-id/command
+    mqttModule.checkCommands()
+    commands = mqttModule.readCommands()
+    if(commands):
+        print(f"Commands received: {commands}")
+
+    # every 5 seconds send telemetry data
+    if(not dataSent and not int(exec_time.total_seconds()) % 5):
+        gpsData = positionSensor.getPositionData()
+
+        data['latitude'] = gpsData['latitude']
+        data['longitude'] = gpsData['longitude']
+        data['velocity'] = spdSensor.getSpeed(exec_time)
+        data['battery'] = batterySensor.getBatteryLevel()
+        data['time'] = datetime.now().isoformat()
+
+        mqttModule.postData(data)
+        dataSent = True
+
+    elif(int(exec_time.total_seconds()) % 5):
+        dataSent = False
