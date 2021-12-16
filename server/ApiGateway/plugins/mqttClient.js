@@ -3,39 +3,32 @@
 const fp = require('fastify-plugin')
 
 module.exports = fp(async function(fastify, opts) {
-    // const aedes = require('aedes')()
-    // const server = require('net').createServer(aedes.handle)
-    // const port = 1883
-
-    // server.listen(port, function() {
-    //     console.log('server started and listening on port ', port)
-    // })
     let mqtt = require('mqtt')
-    let client = mqtt.connect('mqtt://127.0.0.1')
+    let client = mqtt.connect('mqtt://192.168.10.31', { clean: false, retain: true, clientId: 'mqttjs_' + Math.random().toString(16).substr(2, 8) })
 
     client.on('connect', function() {
-        client.subscribe('protocolli-IoT/+/telemetry')
+        console.log("connesso")
+        client.subscribe('protocolli-IoT/telemetry/#')
+
+    })
+    client.on('message', function(topic, message) {
+        let obj = JSON.parse(message)
+
+        topic = topic.slice(topic.indexOf('/') + 1)
+        console.log(topic)
+        topic = topic.slice(topic.indexOf('/') + 1)
+        console.log(topic)
+        topic = topic.slice(6)
+        obj.id = parseInt(topic)
+        fastify.writeDroneData(obj)
     })
 
-    client.on('message', function(topic, message) {
-        const ProtocolliIoTRegex = new RegExp('protocolli-IoT/drone-*');
-        if (ProtocolliIoTRegex.test(topic)) {
-            // message is Buffer
-            let obj = JSON.parse(message)
-            topic = topic.slice(topic.indexOf('/') + 1)
-            topic = topic.slice(0, topic.indexOf('/'))
-            topic = topic.slice(6)
-            obj.id = parseInt(topic)
-            fastify.writeDroneData(obj)
-            client.end()
-        } else {
-            console.log("messaggio non per te")
-        }
-    })
 
     function sendCommandToDrone(droneID) {
         console.log("manda mess")
-        client.publish(`protocolli-IoT/drone-${droneID}/command`, 'shutdown', { qos: 2 })
+        console.log()
+        console.log(`protocolli-IoT/commands/drone-${droneID}`)
+        client.publish(`protocolli-IoT/commands/drone-${droneID}`, 'shutdown', { 'qos': 2, 'retain': true })
     }
-    setInterval(sendCommandToDrone, 2000, 654)
+    setInterval(sendCommandToDrone, 5000, 123456)
 })

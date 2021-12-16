@@ -14,6 +14,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@influxdata/influxdb-client": "^1.21.0",
         "dotenv": "^10.0.0",
         "fastify": "^3.24.0",
         "fastify-autoload": "^3.3.1",
