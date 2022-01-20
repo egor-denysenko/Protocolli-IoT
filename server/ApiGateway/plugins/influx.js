@@ -15,7 +15,7 @@ module.exports = fp(async function(fastify, opts) {
         const writeApi = client.getWriteApi(org, bucket)
         writeApi.useDefaultTags({ host: 'host1' })
         console.log(obj.id)
-        const point = new Point('mem')
+        const droneData = new Point('mem')
             .intField('droneId', obj.id)
             .floatField('velocity', obj.velocity)
             .floatField('longitude', obj.longitude)
@@ -23,7 +23,7 @@ module.exports = fp(async function(fastify, opts) {
             .measurement("DroneData")
             .intField('battery', obj.battery)
             .timestamp(new Date(obj.time))
-        writeApi.writePoint(point)
+        writeApi.writePoint(droneData)
         writeApi
             .close()
             .then(() => {
