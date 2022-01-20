@@ -1,6 +1,10 @@
 import json
-import paho.mqtt.client as paho
-broker = "test.mosquitto.org"
+import os
+import pika
+
+broker = os.environ.get('CLOUDAMQP_URL', "amqp://wsthotdv:I6poeag5EMMsqO3b3S9dlE_lvHA5t_RN@rattlesnake.rmq.cloudamqp.com/wsthotdv")
+exchange = "protocolliIoTAMQP"
+routing_key = "droneTelemetry"
 port = 1883
 subscribed = False
 
@@ -8,37 +12,13 @@ class droneRequests:
     
     def __init__(self, droneName):
         self.droneName = f"drone-{droneName}"
-        self.client = paho.Client(self.droneName)
-        self.client.on_publish = self.on_publish
-        self.client.on_connect = self.on_connect
-        self.client.on_message = self.on_message
-        self.client.connect(broker, port)
-        self.commands = []
-
-    def on_publish(self, client, userdata, result):
-        print("Data published")
-
-    def on_connect(self, client, userdata, flags, rc):
-        print("Client connected")
-        self.client.subscribe(f"protocolli-IoT/{self.droneName}/command")
-
-    def on_message(self, client, userdata, msg):
-        # Incoming messages are saved in a list
-        print(f"Message received: {msg.payload}")
-        self.commands.append(msg.payload.decode())
-
-    def checkCommands(self):
-        # Loop awaiting for commands
-        self.client.loop_read()
-    
-    def readCommands(self):
-        # Return command list
-        commands = []
-        if(self.commands):
-            commands = self.commands
-            self.commands = []
-        return commands
+        params = pika.URLParameters(broker)
+        params.socket_timeout = 5
+        self.connection = pika.BlockingConnection(params)
+        self.channel = self.connection.channel()
+        self.channel.queue_declare(queue='droneTelemetry')
 
     def postData(self, dataDict):
         jsonData = json.dumps(dataDict, indent=4)
-        self.client.publish(f"protocolli-IoT/{self.droneName}/telemetry", jsonData)
+        self.channel.basic_publish(exchange=exchange, routing_key=routing_key, body=jsonData)
+        print("Data sent")
