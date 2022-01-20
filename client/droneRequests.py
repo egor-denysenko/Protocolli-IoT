@@ -3,8 +3,8 @@ import os
 import pika
 
 broker = os.environ.get('CLOUDAMQP_URL', "amqp://wsthotdv:I6poeag5EMMsqO3b3S9dlE_lvHA5t_RN@rattlesnake.rmq.cloudamqp.com/wsthotdv")
-exchange = "protocolliIoTAMQP"
-routing_key = "droneTelemetry"
+exchange = "droneBuffer"
+routing_key = "droneBuffer"
 port = 1883
 subscribed = False
 
