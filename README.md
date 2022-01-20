@@ -2,47 +2,34 @@
 # Componenti Gruppo
 Davide Viotto davide.viotto@stud.tecnicosuperiorekennedy.it
 Egor Denysenko egor.denysenko@stud.tecnicosuperiorekennedy.it
-# Mqtt 
+# AMQP 
 Client Davide Viotto 
 Server Egor Denysenko
 
-# Gestione Parametri Subscribe Server
-Il server avra come parametri di default impostati dalla libreria mqtt.js tranne la clean session che la impostiamo a false; 
-In questo modo alla disconessione il broker manterrà i messaggio con QoS1 e QoS2 per il server
+# Implementazione AMQP Lato Drone
+Lato edge applichiamo una coda lato applicativo e dopo un sucessivo processo 
+si occupera di spedire il dato anche qui attraverso amqp verso il cloud, questa
+scelta seppur non ottimale è utile nel momento in cui dobbiamo andare a simulare 
+entrambi i casi in maniera didattica.
 
-# Gestione Parametri Subscribe Dispositivi Edge
-I dispositivi edge avranno come parametri di connessione di default utilizzati dalla libreria paho-mqtt, a discapito della clean session che la impostiamo a false, in modo da mantenere l'ultimo comando mandato dal server
+exchange bufferAMQP: droneBuffer
 
-# Gestione Parametri Publish Server
-Il server Pubblica i dati mantenendo una data QoS descritta successivamente nella gestione dei topics 
-è mantiene anche una retain session per l'invio per aver la possibilità di ricorstuire lo storico dei comandi all'interno dell'interfaccia web
-# Gestione Parametri Publish Dispositivi Edge
-Il dispositivo edge ha una retain session a true in modo da poter ricorstuire in tempo "reale" i dati che vengono mandati al database
+routing key: droneBuffer
 
-# Gestione Topic 
-Abbiamo Optato per un topic unico per mandare al broker un JSON con tutte le informazioni di telemetria del dispositivo.
+tipo di coda utilizzata: Direct 
+la scelta è stata fatta principalmente lato didattico in quanto ci ritroviamo con un drone unico 
+e simuliamo nel cloud la coda del drone.
 
-Il nostro topic tipo per il drone è stato impostato come:
-protocolli-IoT/telemetry/{drone_id}
-La QoS del messaggio mandato dall'edge al server è 0
+# Implementazione AMQP Lato Cloud 
+Lato cloud anche qui utilizziamo un coda per poter ricevere i dati, in quanto il drone non mandera 
+direttamente i dati al server in cloud ma prima li mandiamo attraverso AMQP (anchessa scelta non ottimale 
+in quanto si sarebbe potuto optare per un protocollo MQTT) verso l'exchange protocolliIoTAMQP anch'essa di 
+tipo direct, con routing key droneTelemetry.
 
-il payload del topic è un JSON con questo schema:
-{  
-  "velocity":float,
-  "longitude":float,
-  "latitude":float,
-  "battery":int,
-  "timestamp":timestamp
-}
+# Invio Comandi Drone
+Partendo da un eventuale applicativo web o da un api le potenziali opzioni disponibili sono:
+- Creare un exchange direct che va a filtrare i comandi con una routing key basata sul drone, in modo da centralizzare una coda per ogni drone
 
-
-# Gestione Command
-Per la gestione dei comandi da inviare al drone abbiamo optaro di mandare una stringa come messaggio 
-
-Il nostro topic tipo per il drone è stato impostato come
-protocolli-IoT/commands/{drone_id}/
-
-Il drone riceverà la stringa con QoS 2
-
-# Gestione Sicurezza Protocollo MQTT
-Per migliorare la sicurezza si può pensare di utilizzare la porta 8883 è gestire la comunicazione attraverso SSL, ma non è stata implementata per mancate conoscenze al riguardo.
+# Parametri Gestione Comandi Drone
+Abbiamo utilizzato un exchange direct di nome droneCommand ed in base alla key andremo a creare una nuova coda per il drone se mancante, 
+ed andremmo ad inserire il messaggio attraverso la routing key che rappresentera il nome del drone
