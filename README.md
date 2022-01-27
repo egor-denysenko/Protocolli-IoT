@@ -52,5 +52,4 @@ un topic per cui l'exchange filtera sarà data.+.RFIDScan utilizziamo la wild ca
 Un altro topic per la gestione degli statu delle conessioni sara status.+.connection per monitorare le connesioni e salvarle nel db
 status.+.disconnection per salvare nel db le disconnessioni.
 
-
 # Gestione Database.
